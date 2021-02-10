@@ -32,6 +32,6 @@ jobs:
         run: mvn -B package
 
       - name: Publish to GitHub Packages Apache Maven
-        run: mvn deploy -Dregistry=https://maven.pkg.github.com/atlascommunity -Dtoken=$GH_TOKEN
+        run: mvn -B deploy
         env:
           GITHUB_TOKEN: ${{ github.token }}
