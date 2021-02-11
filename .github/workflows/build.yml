@@ -28,5 +28,12 @@ jobs:
           path: ~/.m2
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
+      - name: Decrypt gpg private key
+        run: openssl aes-256-cbc -pass pass:$OPENSSL_PWD -in private-key.gpg.enc -out private-key.gpg -d
+        env:
+          OPENSSL_PWD: ${{ secrets.GPG_PWD }}
+
+      - name: Import gpg private key
+        run: gpg --import private-key.gpg
       - name: Build with Maven
-        run: mvn -B verify
+        run: mvn -B -s settings.xml verify
