@@ -30,8 +30,8 @@ jobs:
           restore-keys: ${{ runner.os }}-m2
 
       - name: Store GPG
-        run: echo "$(</dev/stdin)" > private-key.gpg
-        with:
+        run: echo $GPG
+        env:
           GPG: ${{ secrets.GPG }}
 
       - name: Import gpg private key
