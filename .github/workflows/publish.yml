@@ -28,10 +28,21 @@ jobs:
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
 
+      - name: Decrypt gpg private key
+        run: openssl aes-256-cbc -pass pass:$OPENSSL_PWD -in private-key.gpg.enc -out private-key.gpg -d
+        env:
+          OPENSSL_PWD: ${{ secrets.openssl_pwd }}
+
+      - name: Import gpg private key
+        run: gpg --import private-key.gpg
+
       - name: Build with Maven
         run: mvn -B package
 
-      - name: Publish to GitHub Packages Apache Maven
-        run: mvn -B deploy
+      - name: Publish to Maven repo
+        run: mvn -V -B -s settings.xml deploy
         env:
-          GITHUB_TOKEN: ${{ github.token }}
+          GPG_KEY: ${{ secrets.gpg_key }}
+          GPG_PWD: ${{ secrets.gpg_pwd }}
+          OSSRH_USER_TOKEN: ${{ secrets.ossrh_token }}
+          OSSRH_PWD_TOKEN: ${{ secrets.ossrh_pwd }}
