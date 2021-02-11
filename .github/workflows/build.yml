@@ -31,7 +31,8 @@ jobs:
 
       - name: Store GPG
         run: echo "$(</dev/stdin)" > private-key.gpg
-        with: ${{ secrets.GPG }}
+        with:
+          GPG: ${{ secrets.GPG }}
 
       - name: Import gpg private key
         run: gpg --import private-key.gpg
