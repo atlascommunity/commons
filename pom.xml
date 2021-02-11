@@ -7,6 +7,31 @@
     <groupId>io.github.atlascommunity</groupId>
     <artifactId>commons</artifactId>
     <version>3.0</version>
+    <name>Commons plugin</name>
+    <description>Commons library for atlascommunity Jira plugins</description>
+    <url>https://github.com/atlascommunity/commons</url>
+
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <name>Ivan Mashintsev</name>
+            <email>mashintsev@gmail.com</email>
+            <organization>Mail.ru Group</organization>
+            <organizationUrl>https://www.corp.mail.ru/en/</organizationUrl>
+        </developer>
+    </developers>
+
+    <scm>
+        <connection>scm:git:git://git@github.com:atlascommunity/commons.git</connection>
+        <developerConnection>scm:git:ssh://git@github.com:atlascommunity/commons.git</developerConnection>
+        <url>https://github.com/atlascommunity/commons/tree/main</url>
+    </scm>
 
     <dependencies>
         <dependency>
@@ -116,6 +141,46 @@
                     </dependency>
                 </dependencies>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>3.0.1</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar-no-fork</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.2.0</version>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-gpg-plugin</artifactId>
+                <version>1.6</version>
+                <executions>
+                    <execution>
+                        <id>sign-artifacts</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>sign</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 
@@ -124,6 +189,7 @@
         <jira.version>8.13.1</jira.version>
         <maven.compiler.target>1.8</maven.compiler.target>
         <maven.compiler.source>1.8</maven.compiler.source>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
     <repositories>
