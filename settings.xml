@@ -13,7 +13,7 @@
             </activation>
             <properties>
                 <gpg.keyname>${env.GPG_KEY}</gpg.keyname>
-                <gpg.passphrase>${env.GPG_PWD}</gpg.passphrase>
+                <gpg.passphrase></gpg.passphrase>
             </properties>
         </profile>
     </profiles>

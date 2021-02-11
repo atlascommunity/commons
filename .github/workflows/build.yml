@@ -3,9 +3,9 @@ name: Build project on push
 # Controls when the action will run. Triggers the workflow on push or pull request
 on:
   push:
-    branches: [ $default-branch ]
+    branches: [main]
   pull_request:
-    branches: [ $default-branch ]
+    branches: [main]
   # Sequence of patterns matched against refs/tags
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
