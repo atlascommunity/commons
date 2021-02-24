@@ -6,7 +6,7 @@
 
     <groupId>io.github.atlascommunity</groupId>
     <artifactId>commons</artifactId>
-    <version>3.0</version>
+    <version>3.1</version>
     <name>Commons plugin</name>
     <description>Commons library for atlascommunity Jira plugins</description>
     <url>https://github.com/atlascommunity/commons</url>
@@ -68,6 +68,11 @@
         <dependency>
             <groupId>com.atlassian.activeobjects</groupId>
             <artifactId>activeobjects-plugin</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.atlassian.plugin</groupId>
+            <artifactId>atlassian-spring-scanner-annotation</artifactId>
             <scope>provided</scope>
         </dependency>
 
@@ -190,7 +195,7 @@
                     <serverId>ossrh</serverId>
                     <nexusUrl>https://oss.sonatype.org/</nexusUrl>
                     <!-- Set this to true and the release will automatically proceed and sync to Central Repository will follow  -->
-                    <autoReleaseAfterClose>false</autoReleaseAfterClose>
+                    <autoReleaseAfterClose>true</autoReleaseAfterClose>
                 </configuration>
             </plugin>
         </plugins>
