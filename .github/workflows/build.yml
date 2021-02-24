@@ -3,9 +3,9 @@ name: Build project on push
 # Controls when the action will run. Triggers the workflow on push or pull request
 on:
   push:
-    branches: [ $default-branch ]
+    branches: [main]
   pull_request:
-    branches: [ $default-branch ]
+    branches: [main]
   # Sequence of patterns matched against refs/tags
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
@@ -28,5 +28,14 @@ jobs:
           path: ~/.m2
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
+
+      - name: Store GPG
+        run: echo $GPG
+        env:
+          GPG: ${{ secrets.GPG }}
+
+      - name: Import gpg private key
+        run: gpg --import private-key.gpg
+
       - name: Build with Maven
-        run: mvn -B verify
+        run: mvn -B -s settings.xml verify
