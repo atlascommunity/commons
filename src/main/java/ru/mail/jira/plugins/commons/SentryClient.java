@@ -18,8 +18,9 @@ public class SentryClient {
     private static String pluginKey;
     private static String pluginVersion;
 
-    public static void init(JiraAuthenticationContext jiraAuthenticationContext, PluginProperties pluginProperties, String dsn) {
-        if (hasConnection(dsn)) {
+    public static void init(JiraAuthenticationContext jiraAuthenticationContext, PluginProperties pluginProperties) {
+        String dsn = pluginProperties.getSentryDsn().orElse(null);
+        if (dsn != null && hasConnection(dsn)) {
             SentryClient.jiraAuthenticationContext = jiraAuthenticationContext;
             Sentry.init(dsn);
 
