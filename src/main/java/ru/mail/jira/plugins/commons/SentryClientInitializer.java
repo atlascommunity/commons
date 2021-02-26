@@ -11,10 +11,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class SentryClientInitializer implements InitializingBean, DisposableBean {
-
     private static final Logger log = LoggerFactory.getLogger(SentryClientInitializer.class);
-    private static final String DSN =
-            "http://488a7fa73b2343afb523a7139a7226fa:08f1454a8d514306a3cd2837cfc080a3@sentry.intdev.devmail.ru/19";
 
     private final JiraAuthenticationContext jiraAuthenticationContext;
     private final PluginProperties pluginProperties;
@@ -36,6 +33,6 @@ public class SentryClientInitializer implements InitializingBean, DisposableBean
     @Override
     public void afterPropertiesSet() throws Exception {
         log.info("Init SentryClient");
-        SentryClient.init(jiraAuthenticationContext, pluginProperties, DSN);
+        SentryClient.init(jiraAuthenticationContext, pluginProperties);
     }
 }

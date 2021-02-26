@@ -1,6 +1,5 @@
 package ru.mail.jira.plugins.commons;
 
-import com.atlassian.jira.component.ComponentAccessor;
 import com.atlassian.jira.config.properties.ApplicationProperties;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import org.springframework.stereotype.Component;
@@ -106,6 +105,10 @@ public class PluginProperties {
 
     public Optional<String> getPluginVersion() {
         return pluginPropertyReader.getString("pluginVersion");
+    }
+
+    public Optional<String> getSentryDsn() {
+        return pluginPropertyReader.getString("sentryDsn");
     }
 
     public void setString(String key, String val) {
