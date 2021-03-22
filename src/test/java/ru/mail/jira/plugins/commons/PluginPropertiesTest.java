@@ -24,7 +24,7 @@ public class PluginPropertiesTest {
         ApplicationProperties applicationProperties = mock(ApplicationPropertiesImpl.class);
         when(applicationProperties.getString(anyString())).thenReturn(null);
 
-        pluginProperties = new PluginProperties(applicationProperties);
+        pluginProperties = new PluginProperties();
     }
 
     @Test
