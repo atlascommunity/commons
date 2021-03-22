@@ -1,7 +1,9 @@
 package ru.mail.jira.plugins.commons;
 
+import com.atlassian.jira.component.ComponentAccessor;
 import com.atlassian.jira.config.properties.ApplicationProperties;
 import com.atlassian.jira.config.properties.ApplicationPropertiesImpl;
+import com.atlassian.jira.mock.component.MockComponentWorker;
 import com.atlassian.jira.security.JiraAuthenticationContext;
 
 import static org.mockito.ArgumentMatchers.anyString;
@@ -17,10 +19,12 @@ class SentryClientInitializerTest {
   void setUp() {
     jiraAuthenticationContext = mock(JiraAuthenticationContext.class);
 
+    MockComponentWorker componentAccessorWorker = new MockComponentWorker();
+    ComponentAccessor.initialiseWorker(componentAccessorWorker);
     ApplicationProperties applicationProperties = mock(ApplicationPropertiesImpl.class);
     when(applicationProperties.getString(anyString())).thenReturn(null);
 
-    pluginProperties = new PluginProperties(applicationProperties);
+    pluginProperties = new PluginProperties();
   }
 
   @org.junit.jupiter.api.Test

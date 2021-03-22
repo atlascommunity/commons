@@ -1,7 +1,7 @@
 package ru.mail.jira.plugins.commons;
 
+import com.atlassian.jira.component.ComponentAccessor;
 import com.atlassian.jira.config.properties.ApplicationProperties;
-import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
@@ -11,11 +11,9 @@ public class PluginProperties {
     private final ApplicationProperties applicationProperties;
     private final PluginPropertyReader pluginPropertyReader;
 
-    private static PluginProperties instance;
-
-    public PluginProperties(@ComponentImport ApplicationProperties applicationProperties) {
+    public PluginProperties() {
         this.pluginPropertyReader = new PluginPropertyReader();
-        this.applicationProperties = applicationProperties;
+        this.applicationProperties = ComponentAccessor.getApplicationProperties();
     }
 
     public Optional<String> getString(String key) {

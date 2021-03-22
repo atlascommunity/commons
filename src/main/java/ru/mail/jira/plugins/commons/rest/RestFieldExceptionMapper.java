@@ -13,8 +13,9 @@ public class RestFieldExceptionMapper implements ExceptionMapper<RestFieldExcept
     @Override
     public Response toResponse(RestFieldException exception) {
         return Response.status(Response.Status.BAD_REQUEST)
-                       .type(MediaType.APPLICATION_JSON_TYPE)
-                       .entity(new ErrorDto(exception.getMessage(), exception.getField()))
-                       .build();
+                .type(MediaType.APPLICATION_JSON_TYPE)
+                .header("X-Atlassian-Rest-Exception-Field", exception.getField())
+                .entity(new ErrorDto(exception.getMessage(), exception.getField()))
+                .build();
     }
 }
