@@ -5,26 +5,24 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement
 public class ErrorDto {
-    @XmlElement
-    private final String error;
-    @XmlElement
-    private final String field;
+  @XmlElement private final String error;
+  @XmlElement private final String field;
 
-    public ErrorDto(String error, String field) {
-        this.error = error;
-        this.field = field;
-    }
+  public ErrorDto(String error, String field) {
+    this.error = error;
+    this.field = field;
+  }
 
-    public ErrorDto(String error) {
-        this.error = error;
-        this.field = null;
-    }
+  public ErrorDto(String error) {
+    this.error = error;
+    this.field = null;
+  }
 
-    public String getError() {
-        return error;
-    }
+  public String getError() {
+    return error;
+  }
 
-    public String getField() {
-        return field;
-    }
+  public String getField() {
+    return field;
+  }
 }

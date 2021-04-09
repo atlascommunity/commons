@@ -6,7 +6,7 @@
 
     <groupId>io.github.atlascommunity</groupId>
     <artifactId>commons</artifactId>
-    <version>3.3</version>
+    <version>3.4</version>
     <name>Commons plugin</name>
     <description>Commons library for atlascommunity Jira plugins</description>
     <url>https://github.com/atlascommunity/commons</url>
@@ -91,8 +91,21 @@
         <dependency>
             <groupId>com.konghq</groupId>
             <artifactId>unirest-java</artifactId>
-            <version>3.11.04</version>
-            <scope>provided</scope>
+            <version>3.11.09</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.httpcomponents</groupId>
+                    <artifactId>httpclient</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.httpcomponents</groupId>
+                    <artifactId>httpmime</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.google.code.gson</groupId>
+                    <artifactId>gson</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
@@ -105,12 +118,6 @@
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-engine</artifactId>
             <version>5.7.0</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.junit.vintage</groupId>
-            <artifactId>junit-vintage-engine</artifactId>
-            <version>5.6.2</version>
             <scope>test</scope>
         </dependency>
         <dependency>

@@ -10,11 +10,11 @@ import javax.ws.rs.ext.Provider;
 
 @Provider
 public class WebSudoRequiredExceptionMapper implements ExceptionMapper<WebSudoRequiredException> {
-    @Override
-    public Response toResponse(WebSudoRequiredException exception) {
-        return Response.status(Response.Status.FORBIDDEN)
-                       .entity(new ErrorDto(exception.getMessage()))
-                       .type(MediaType.APPLICATION_JSON_TYPE)
-                       .build();
-    }
+  @Override
+  public Response toResponse(WebSudoRequiredException exception) {
+    return Response.status(Response.Status.FORBIDDEN)
+        .entity(new ErrorDto(exception.getMessage()))
+        .type(MediaType.APPLICATION_JSON_TYPE)
+        .build();
+  }
 }

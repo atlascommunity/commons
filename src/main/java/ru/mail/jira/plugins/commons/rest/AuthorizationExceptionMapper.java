@@ -10,11 +10,11 @@ import javax.ws.rs.ext.Provider;
 
 @Provider
 public class AuthorizationExceptionMapper implements ExceptionMapper<AuthorisationException> {
-    @Override
-    public Response toResponse(AuthorisationException exception) {
-        return Response.status(Response.Status.FORBIDDEN)
-                       .entity(new ErrorDto(exception.getMessage()))
-                       .type(MediaType.APPLICATION_JSON_TYPE)
-                       .build();
-    }
+  @Override
+  public Response toResponse(AuthorisationException exception) {
+    return Response.status(Response.Status.FORBIDDEN)
+        .entity(new ErrorDto(exception.getMessage()))
+        .type(MediaType.APPLICATION_JSON_TYPE)
+        .build();
+  }
 }

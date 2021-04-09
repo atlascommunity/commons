@@ -10,12 +10,12 @@ import javax.ws.rs.ext.Provider;
 
 @Provider
 public class RestFieldExceptionMapper implements ExceptionMapper<RestFieldException> {
-    @Override
-    public Response toResponse(RestFieldException exception) {
-        return Response.status(Response.Status.BAD_REQUEST)
-                .type(MediaType.APPLICATION_JSON_TYPE)
-                .header("X-Atlassian-Rest-Exception-Field", exception.getField())
-                .entity(new ErrorDto(exception.getMessage(), exception.getField()))
-                .build();
-    }
+  @Override
+  public Response toResponse(RestFieldException exception) {
+    return Response.status(Response.Status.BAD_REQUEST)
+        .type(MediaType.APPLICATION_JSON_TYPE)
+        .header("X-Atlassian-Rest-Exception-Field", exception.getField())
+        .entity(new ErrorDto(exception.getMessage(), exception.getField()))
+        .build();
+  }
 }

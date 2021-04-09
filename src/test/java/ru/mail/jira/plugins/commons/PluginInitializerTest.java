@@ -10,7 +10,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-class SentryClientInitializerTest {
+class PluginInitializerTest {
 
   private PluginProperties pluginProperties;
   private JiraAuthenticationContext jiraAuthenticationContext;
@@ -34,8 +34,8 @@ class SentryClientInitializerTest {
 
   @org.junit.jupiter.api.Test
   void afterPropertiesSet() throws Exception {
-    SentryClientInitializer sentryClientInitializer = new SentryClientInitializer(jiraAuthenticationContext, pluginProperties);
-    sentryClientInitializer.afterPropertiesSet();
+    PluginInitializer pluginInitializer = new PluginInitializer(jiraAuthenticationContext, pluginProperties);
+    pluginInitializer.afterPropertiesSet();
 
     SentryClient.capture("test");
   }
