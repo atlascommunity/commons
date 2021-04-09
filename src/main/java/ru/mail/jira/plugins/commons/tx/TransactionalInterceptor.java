@@ -11,29 +11,29 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 
 public final class TransactionalInterceptor implements MethodInterceptor {
-    public static final Class<? extends Annotation> ANNOTATION_CLASS = Transactional.class;
+  public static final Class<? extends Annotation> ANNOTATION_CLASS = Transactional.class;
 
-    @Override
-    public Object invoke(MethodInvocation invocation) throws Throwable {
-        if (AnnotationUtil.isAnnotated(ANNOTATION_CLASS, invocation.getMethod())) {
-            return executeInTransaction(invocation);
-        } else {
-            return invocation.proceed();
-        }
+  @Override
+  public Object invoke(MethodInvocation invocation) throws Throwable {
+    if (AnnotationUtil.isAnnotated(ANNOTATION_CLASS, invocation.getMethod())) {
+      return executeInTransaction(invocation);
+    } else {
+      return invocation.proceed();
     }
+  }
 
-    private Object executeInTransaction(MethodInvocation invocation) throws Throwable {
-        Transaction transaction = Txn.begin();
-        try {
-            Object result = invocation.proceed();
+  private Object executeInTransaction(MethodInvocation invocation) throws Throwable {
+    Transaction transaction = Txn.begin();
+    try {
+      Object result = invocation.proceed();
 
-            transaction.commit();
+      transaction.commit();
 
-            return result;
-        } catch (InvocationTargetException e) {
-            throw e.getTargetException();
-        } finally {
-            transaction.finallyRollbackIfNotCommitted();
-        }
+      return result;
+    } catch (InvocationTargetException e) {
+      throw e.getTargetException();
+    } finally {
+      transaction.finallyRollbackIfNotCommitted();
     }
+  }
 }

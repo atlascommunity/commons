@@ -9,11 +9,11 @@ import javax.ws.rs.ext.Provider;
 
 @Provider
 public class SecurityExceptionMapper implements ExceptionMapper<SecurityException> {
-    @Override
-    public Response toResponse(SecurityException exception) {
-        return Response.status(Response.Status.FORBIDDEN)
-                       .entity(new ErrorDto(exception.getMessage()))
-                       .type(MediaType.APPLICATION_JSON_TYPE)
-                       .build();
-    }
+  @Override
+  public Response toResponse(SecurityException exception) {
+    return Response.status(Response.Status.FORBIDDEN)
+        .entity(new ErrorDto(exception.getMessage()))
+        .type(MediaType.APPLICATION_JSON_TYPE)
+        .build();
+  }
 }

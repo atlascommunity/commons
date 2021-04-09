@@ -9,12 +9,13 @@ import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
 @Provider
-public class AuthenticationRequiredExceptionMapper implements ExceptionMapper<AuthenticationRequiredException> {
-    @Override
-    public Response toResponse(AuthenticationRequiredException exception) {
-        return Response.status(Response.Status.UNAUTHORIZED)
-                       .entity(new ErrorDto(exception.getMessage()))
-                       .type(MediaType.APPLICATION_JSON_TYPE)
-                       .build();
-    }
+public class AuthenticationRequiredExceptionMapper
+    implements ExceptionMapper<AuthenticationRequiredException> {
+  @Override
+  public Response toResponse(AuthenticationRequiredException exception) {
+    return Response.status(Response.Status.UNAUTHORIZED)
+        .entity(new ErrorDto(exception.getMessage()))
+        .type(MediaType.APPLICATION_JSON_TYPE)
+        .build();
+  }
 }
