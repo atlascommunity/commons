@@ -17,7 +17,7 @@ public class PluginProperties {
   }
 
   private String buildPropertyKey(String name) {
-    return String.format("%s.%s", getPluginKey().orElse(""), name);
+    return getPluginKey().map(pluginKey -> String.format("%s.%s", pluginKey, name)).orElse(name);
   }
 
   public Optional<String> getString(String name) {
