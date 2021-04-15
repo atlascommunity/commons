@@ -29,6 +29,10 @@ public class PluginProperties {
     return getString(key).orElse(defaultValue);
   }
 
+  public String getStringByName(String name) {
+    return getString(String.format("%s.%s", getPluginKey().orElse(""), name), "");
+  }
+
   public Optional<Integer> getInt(String key) {
     if (key == null) return Optional.empty();
     String value = applicationProperties.getString(key);
