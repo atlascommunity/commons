@@ -16,8 +16,13 @@ public class PluginProperties {
     this.applicationProperties = ComponentAccessor.getApplicationProperties();
   }
 
-  public Optional<String> getString(String key) {
-    if (key == null) return Optional.empty();
+  private String buildPropertyKey(String name) {
+    return getPluginKey().map(pluginKey -> String.format("%s.%s", pluginKey, name)).orElse(name);
+  }
+
+  public Optional<String> getString(String name) {
+    if (name == null) return Optional.empty();
+    String key = buildPropertyKey(name);
     String value = applicationProperties.getString(key);
     if (value == null || value.equals("")) {
       return pluginPropertyReader.getString(key);
@@ -25,12 +30,13 @@ public class PluginProperties {
     return Optional.of(value);
   }
 
-  public String getString(String key, String defaultValue) {
-    return getString(key).orElse(defaultValue);
+  public String getString(String name, String defaultValue) {
+    return getString(name).orElse(defaultValue);
   }
 
-  public Optional<Integer> getInt(String key) {
-    if (key == null) return Optional.empty();
+  public Optional<Integer> getInt(String name) {
+    if (name == null) return Optional.empty();
+    String key = buildPropertyKey(name);
     String value = applicationProperties.getString(key);
     if (value == null || value.equals("")) {
       return pluginPropertyReader.getInt(key);
@@ -42,12 +48,13 @@ public class PluginProperties {
     }
   }
 
-  public Integer getInt(String key, int defaultValue) {
-    return getInt(key).orElse(defaultValue);
+  public Integer getInt(String name, int defaultValue) {
+    return getInt(name).orElse(defaultValue);
   }
 
-  public Optional<Long> getLong(String key) {
-    if (key == null) return Optional.empty();
+  public Optional<Long> getLong(String name) {
+    if (name == null) return Optional.empty();
+    String key = buildPropertyKey(name);
     String value = applicationProperties.getString(key);
     if (value == null || value.equals("")) {
       return pluginPropertyReader.getLong(key);
@@ -59,12 +66,13 @@ public class PluginProperties {
     }
   }
 
-  public Long getLong(String key, long defaultValue) {
-    return getLong(key).orElse(defaultValue);
+  public Long getLong(String name, long defaultValue) {
+    return getLong(name).orElse(defaultValue);
   }
 
-  public Optional<Double> getDouble(String key) {
-    if (key == null) return Optional.empty();
+  public Optional<Double> getDouble(String name) {
+    if (name == null) return Optional.empty();
+    String key = buildPropertyKey(name);
     String value = applicationProperties.getString(key);
     if (value == null || value.equals("")) {
       return pluginPropertyReader.getDouble(key);
@@ -76,12 +84,13 @@ public class PluginProperties {
     }
   }
 
-  public Double getDouble(String key, double defaultValue) {
-    return getDouble(key).orElse(defaultValue);
+  public Double getDouble(String name, double defaultValue) {
+    return getDouble(name).orElse(defaultValue);
   }
 
-  public Optional<Boolean> getBoolean(String key) {
-    if (key == null) return Optional.empty();
+  public Optional<Boolean> getBoolean(String name) {
+    if (name == null) return Optional.empty();
+    String key = buildPropertyKey(name);
     String value = applicationProperties.getString(key);
     if (value == null || value.equals("")) {
       return pluginPropertyReader.getBoolean(key);
@@ -89,8 +98,8 @@ public class PluginProperties {
     return Optional.of(Boolean.parseBoolean(value));
   }
 
-  public Boolean getBoolean(String key, boolean defaultValue) {
-    return getBoolean(key).orElse(defaultValue);
+  public Boolean getBoolean(String name, boolean defaultValue) {
+    return getBoolean(name).orElse(defaultValue);
   }
 
   public Optional<String> getPluginKey() {
