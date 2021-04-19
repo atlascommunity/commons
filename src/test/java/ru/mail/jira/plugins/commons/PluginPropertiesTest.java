@@ -29,7 +29,7 @@ public class PluginPropertiesTest {
 
     @Test
     void getProperty_AssertionSuccess() {
-        Optional<String> value = pluginProperties.getString("pluginName");
+        Optional<String> value = pluginProperties.getPluginName();
         assertTrue(value.isPresent());
         assertEquals("${project.name}", value.get());
     }
