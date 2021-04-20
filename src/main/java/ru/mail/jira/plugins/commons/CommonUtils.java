@@ -145,6 +145,26 @@ public class CommonUtils {
     ComponentAccessor.getMailQueue().addItem(item);
   }
 
+  public static void sendEmail(String email, String subject, String message, boolean isHtmlFormat, Locale locale) {
+    Map<String, Object> params = new HashMap<String, Object>();
+    params.put("subject", subject);
+    params.put("message", message);
+
+    Email emailAddress = new Email(email);
+
+    MailQueueItem item =
+            new EmailBuilder(emailAddress, isHtmlFormat ? "text/html" : "text/plain", locale)
+                    .withSubject(subject)
+                    .withBody(message)
+                    .withBodyFromFile(
+                            isHtmlFormat
+                                    ? "ru/mail/jira/plugins/sso/templates/email-html.vm"
+                                    : "ru/mail/jira/plugins/sso/templates/email-text.vm")
+                    .addParameters(params)
+                    .renderLater();
+    ComponentAccessor.getMailQueue().addItem(item);
+  }
+
   public static String getStackTrace(Throwable e) {
     Writer stackTrace = new StringWriter();
     e.printStackTrace(new PrintWriter(stackTrace));
