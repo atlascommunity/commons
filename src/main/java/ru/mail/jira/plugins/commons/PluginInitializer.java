@@ -27,6 +27,7 @@ public class PluginInitializer implements InitializingBean, DisposableBean {
 
   @Override
   public void afterPropertiesSet() throws Exception {
+    HttpClient.init();
     SentryClient.init(jiraAuthenticationContext, pluginProperties);
   }
 }
