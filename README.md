@@ -7,4 +7,6 @@ ru.mail.jira.plugins.commons
 
 #Publishing 
 
-mvn -B -s settings.xml -P publish clean deploy
+
+export MAVEN_OPTS="--add-opens=java.base/java.util=ALL-UNNAMED --add-opens=java.base/java.lang.reflect=ALL-UNNAMED --add-opens=java.base/java.text=ALL-UNNAMED --add-opens=java.desktop/java.awt.font=ALL-UNNAMED"
+mvn -B -s settings.xml clean deploy
