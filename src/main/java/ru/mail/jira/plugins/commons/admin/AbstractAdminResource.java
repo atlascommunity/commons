@@ -63,8 +63,7 @@ public abstract class AbstractAdminResource<DTO, T extends Entity> {
   @PUT
   @Path("{id}")
   @NotNull
-  public DataDTO<DTO> update(@PathParam("id") int id, @NotNull DTO data, @Nullable DTO previousData)
-      throws NotFoundException {
+  public DataDTO<DTO> update(@PathParam("id") int id, @NotNull DTO data) throws NotFoundException {
     checkIsAdmin();
     return DataDTO.just(repository.entityToDto(repository.update(id, data)));
   }
@@ -105,7 +104,7 @@ public abstract class AbstractAdminResource<DTO, T extends Entity> {
   @GET()
   @Path("many")
   @NotNull
-  public DataListDTO<DTO> getMany(@QueryParam("ids") @NotNull Set<Integer> ids) {
+  public DataListDTO<DTO> getMany(@QueryParam("ids[]") @NotNull Set<Integer> ids) {
     checkIsAdmin();
 
     return DataListDTO.just(
@@ -140,7 +139,7 @@ public abstract class AbstractAdminResource<DTO, T extends Entity> {
   @PUT
   @NotNull
   public DataListDTO<Integer> updateMany(
-      @QueryParam("ids") @NotNull Set<Integer> ids, @NotNull DTO data) {
+      @QueryParam("ids[]") @NotNull Set<Integer> ids, @NotNull DTO data) {
     checkIsAdmin();
 
     return DataListDTO.just(repository.update(ids, data));
@@ -149,7 +148,7 @@ public abstract class AbstractAdminResource<DTO, T extends Entity> {
   @DELETE
   @Path("{id}")
   @NotNull
-  public DataDTO<DTO> delete(@PathParam("id") int id, @Nullable DTO previousData) {
+  public DataDTO<DTO> delete(@PathParam("id") int id) {
     checkIsAdmin();
 
     T t = repository.findById(id).orElse(null);
@@ -164,7 +163,7 @@ public abstract class AbstractAdminResource<DTO, T extends Entity> {
 
   @DELETE
   @NotNull
-  public DataListDTO<Integer> deleteMany(@QueryParam("ids") @NotNull Set<Integer> ids) {
+  public DataListDTO<Integer> deleteMany(@QueryParam("ids[]") @NotNull Set<Integer> ids) {
     checkIsAdmin();
 
     repository.deleteAllById(ids);
