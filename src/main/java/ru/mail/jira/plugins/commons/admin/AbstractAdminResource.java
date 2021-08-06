@@ -89,7 +89,7 @@ public abstract class AbstractAdminResource<DTO, T extends Entity> {
 
     Page<T> result =
         repository.findAll(
-            Pageable.<DTO>builder()
+            Pageable.builder()
                 .page(page)
                 .size(limit)
                 .sort(Sort.build(sort, order))
@@ -129,7 +129,7 @@ public abstract class AbstractAdminResource<DTO, T extends Entity> {
         repository.findBy(
             target,
             id,
-            Pageable.<DTO>builder().page(page).size(limit).sort(Sort.build(sort, order)).build());
+            Pageable.builder().page(page).size(limit).sort(Sort.build(sort, order)).build());
 
     return DataListDTO.just(
         Arrays.stream(result.getData()).map(repository::entityToDto).collect(Collectors.toList()),

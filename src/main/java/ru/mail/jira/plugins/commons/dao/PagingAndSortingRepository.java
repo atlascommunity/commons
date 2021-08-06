@@ -89,7 +89,7 @@ public abstract class PagingAndSortingRepository<T extends Entity, DTO> {
 
   @NotNull
   // todo implement filtering
-  public Page<T> findAll(@NotNull Pageable<DTO> pageable) {
+  public Page<T> findAll(@NotNull Pageable pageable) {
     return Page.<T>builder()
         .data(
             ao.find(
@@ -97,13 +97,18 @@ public abstract class PagingAndSortingRepository<T extends Entity, DTO> {
                 Query.select()
                     .order(pageable.orderClause())
                     .offset(pageable.offset())
-                    .limit(pageable.limit())))
-        .total(count())
+                    .limit(pageable.limit())
+                    .where(pageable.whereClause(), pageable.whereParams())))
+        .total(count(pageable))
         .build();
   }
 
   public int count() {
     return ao.count(type);
+  }
+
+  public int count(Pageable pageable) {
+    return ao.count(type, Query.select().where(pageable.whereClause(), pageable.whereParams()));
   }
 
   public int countBy(String target, int id) {
@@ -132,7 +137,7 @@ public abstract class PagingAndSortingRepository<T extends Entity, DTO> {
         .collect(Collectors.toList());
   }
 
-  public Page<T> findBy(@NotNull String target, int id, Pageable<DTO> pageable) {
+  public Page<T> findBy(@NotNull String target, int id, Pageable pageable) {
     return Page.<T>builder()
         .data(
             ao.find(
