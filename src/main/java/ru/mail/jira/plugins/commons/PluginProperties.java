@@ -2,6 +2,7 @@ package ru.mail.jira.plugins.commons;
 
 import com.atlassian.jira.component.ComponentAccessor;
 import com.atlassian.jira.config.properties.ApplicationProperties;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
@@ -18,6 +19,16 @@ public class PluginProperties {
 
   private String buildPropertyKey(String name) {
     return getPluginKey().map(pluginKey -> String.format("%s.%s", pluginKey, name)).orElse(name);
+  }
+
+  public String[] getStringArray(String name) {
+    if (name == null) return new String[0];
+    String key = buildPropertyKey(name);
+    String value = applicationProperties.getString(key);
+    if (value == null || value.equals("")) {
+      value = pluginPropertyReader.getString(key).orElse("");
+    }
+    return StringUtils.split(value, ",");
   }
 
   public Optional<String> getString(String name) {

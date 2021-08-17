@@ -4,6 +4,7 @@ import com.atlassian.jira.exception.NotFoundException;
 import com.atlassian.jira.permission.GlobalPermissionKey;
 import com.atlassian.jira.security.GlobalPermissionManager;
 import com.atlassian.jira.security.JiraAuthenticationContext;
+import com.atlassian.jira.security.groups.GroupManager;
 import com.atlassian.jira.user.ApplicationUser;
 import lombok.extern.slf4j.Slf4j;
 import net.java.ao.Entity;
@@ -11,6 +12,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import ru.mail.jira.plugins.commons.PluginProperties;
 import ru.mail.jira.plugins.commons.dao.*;
 import ru.mail.jira.plugins.commons.dto.DataDTO;
 import ru.mail.jira.plugins.commons.dto.DataListDTO;
@@ -29,17 +31,24 @@ import java.util.stream.Collectors;
 public abstract class AbstractAdminResource<DTO, T extends Entity> {
   protected final PagingAndSortingRepository<T, DTO> repository;
   protected final GlobalPermissionManager globalPermissionManager;
+  protected final GroupManager groupManager;
   protected final JiraAuthenticationContext jiraAuthenticationContext;
+  protected final PluginProperties pluginProperties;
+
   protected final ObjectMapper objectMapper = new ObjectMapper();
   protected final Class<DTO> type;
 
   protected AbstractAdminResource(
       PagingAndSortingRepository<T, DTO> repository,
       GlobalPermissionManager globalPermissionManager,
-      JiraAuthenticationContext jiraAuthenticationContext) {
+      JiraAuthenticationContext jiraAuthenticationContext,
+      GroupManager groupManager,
+      PluginProperties pluginProperties) {
     this.repository = repository;
     this.globalPermissionManager = globalPermissionManager;
+    this.groupManager = groupManager;
     this.jiraAuthenticationContext = jiraAuthenticationContext;
+    this.pluginProperties = pluginProperties;
     this.type =
         (Class<DTO>)
             ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];
@@ -49,14 +58,14 @@ public abstract class AbstractAdminResource<DTO, T extends Entity> {
   @Path("{id}")
   @NotNull
   public DataDTO<DTO> getOne(@PathParam("id") int id) throws NotFoundException {
-    checkIsAdmin();
+    checkPermissions();
     return DataDTO.just(repository.entityToDto(repository.get(id)));
   }
 
   @POST
   @NotNull
   public DataDTO<DTO> create(@NotNull DTO data) {
-    checkIsAdmin();
+    checkPermissions();
     return DataDTO.just(repository.entityToDto(repository.create(data)));
   }
 
@@ -64,7 +73,7 @@ public abstract class AbstractAdminResource<DTO, T extends Entity> {
   @Path("{id}")
   @NotNull
   public DataDTO<DTO> update(@PathParam("id") int id, @NotNull DTO data) throws NotFoundException {
-    checkIsAdmin();
+    checkPermissions();
     return DataDTO.just(repository.entityToDto(repository.update(id, data)));
   }
 
@@ -76,7 +85,7 @@ public abstract class AbstractAdminResource<DTO, T extends Entity> {
       @Nullable @QueryParam("sort") String sort,
       @Nullable @QueryParam("order") String order,
       @Nullable @QueryParam("filter") String filter) {
-    checkIsAdmin();
+    checkPermissions();
 
     DTO filterDto = null;
     if (StringUtils.isNotEmpty(filter)) {
@@ -105,7 +114,7 @@ public abstract class AbstractAdminResource<DTO, T extends Entity> {
   @Path("many")
   @NotNull
   public DataListDTO<DTO> getMany(@QueryParam("ids[]") @NotNull Set<Integer> ids) {
-    checkIsAdmin();
+    checkPermissions();
 
     return DataListDTO.just(
         repository.findAllById(ids).stream()
@@ -123,7 +132,7 @@ public abstract class AbstractAdminResource<DTO, T extends Entity> {
       @Nullable @QueryParam("limit") Integer limit,
       @Nullable @QueryParam("sort") String sort,
       @Nullable @QueryParam("order") String order) {
-    checkIsAdmin();
+    checkPermissions();
 
     Page<T> result =
         repository.findBy(
@@ -140,7 +149,7 @@ public abstract class AbstractAdminResource<DTO, T extends Entity> {
   @NotNull
   public DataListDTO<Integer> updateMany(
       @QueryParam("ids[]") @NotNull Set<Integer> ids, @NotNull DTO data) {
-    checkIsAdmin();
+    checkPermissions();
 
     return DataListDTO.just(repository.update(ids, data));
   }
@@ -149,7 +158,7 @@ public abstract class AbstractAdminResource<DTO, T extends Entity> {
   @Path("{id}")
   @NotNull
   public DataDTO<DTO> delete(@PathParam("id") int id) {
-    checkIsAdmin();
+    checkPermissions();
 
     T t = repository.findById(id).orElse(null);
     if (t != null) {
@@ -164,7 +173,7 @@ public abstract class AbstractAdminResource<DTO, T extends Entity> {
   @DELETE
   @NotNull
   public DataListDTO<Integer> deleteMany(@QueryParam("ids[]") @NotNull Set<Integer> ids) {
-    checkIsAdmin();
+    checkPermissions();
 
     repository.deleteAllById(ids);
 
@@ -175,9 +184,15 @@ public abstract class AbstractAdminResource<DTO, T extends Entity> {
     return globalPermissionManager.hasPermission(GlobalPermissionKey.ADMINISTER, user);
   }
 
-  private void checkIsAdmin() throws SecurityException {
-    if (!isJiraAdmin(jiraAuthenticationContext.getLoggedInUser())) {
-      throw new SecurityException("You can't access this resource");
+  private void checkPermissions() throws SecurityException {
+    ApplicationUser user = jiraAuthenticationContext.getLoggedInUser();
+    if (isJiraAdmin(user)) {
+      return;
     }
+    if (Arrays.stream(pluginProperties.getStringArray("access-admin-groups"))
+        .anyMatch(group -> groupManager.isUserInGroup(user, group))) {
+      return;
+    }
+    throw new SecurityException("You can't access this resource");
   }
 }
