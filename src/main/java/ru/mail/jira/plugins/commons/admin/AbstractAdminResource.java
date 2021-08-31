@@ -101,12 +101,12 @@ public abstract class AbstractAdminResource<DTO, T extends Entity> {
             Pageable.builder()
                 .page(page)
                 .size(limit)
-                .sort(Sort.build(sort, order))
+                .sort(Sort.build(repository.mapDbField(sort), order))
                 .filter(Filter.just(filterDto))
                 .build());
 
     return DataListDTO.just(
-        Arrays.stream(result.getData()).map(repository::entityToDto).collect(Collectors.toList()),
+        result.getData().stream().map(repository::entityToDto).collect(Collectors.toList()),
         result.getTotal());
   }
 
@@ -138,10 +138,14 @@ public abstract class AbstractAdminResource<DTO, T extends Entity> {
         repository.findBy(
             target,
             id,
-            Pageable.builder().page(page).size(limit).sort(Sort.build(sort, order)).build());
+            Pageable.builder()
+                .page(page)
+                .size(limit)
+                .sort(Sort.build(repository.mapDbField(sort), order))
+                .build());
 
     return DataListDTO.just(
-        Arrays.stream(result.getData()).map(repository::entityToDto).collect(Collectors.toList()),
+        result.getData().stream().map(repository::entityToDto).collect(Collectors.toList()),
         result.getTotal());
   }
 
