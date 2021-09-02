@@ -10,7 +10,10 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.ParameterizedType;
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -87,17 +90,19 @@ public abstract class PagingAndSortingRepository<T extends Entity, DTO> {
   }
 
   @NotNull
-  public Page<T> findAll(@NotNull Pageable pageable) {
-    List<T> result = new ArrayList<>();
-    ao.stream(
-        type,
-        Query.select()
-            .order(pageable.orderClause())
-            .offset(pageable.offset())
-            .limit(pageable.limit())
-            .where(pageable.whereClause(), pageable.whereParams()),
-        result::add);
-    return Page.<T>builder().data(result).total(count(pageable)).build();
+  public Page<DTO> findAll(@NotNull Pageable pageable) {
+    List<DTO> result =
+        Arrays.stream(
+                ao.find(
+                    type,
+                    Query.select()
+                        .order(pageable.orderClause())
+                        .offset(pageable.offset())
+                        .limit(pageable.limit())
+                        .where(pageable.whereClause(), pageable.whereParams())))
+            .map(this::entityToDto)
+            .collect(Collectors.toList());
+    return Page.<DTO>builder().data(result).total(count(pageable)).build();
   }
 
   public int count() {
@@ -134,17 +139,19 @@ public abstract class PagingAndSortingRepository<T extends Entity, DTO> {
         .collect(Collectors.toList());
   }
 
-  public Page<T> findBy(@NotNull String target, int id, Pageable pageable) {
-    List<T> result = new ArrayList<>();
-    ao.stream(
-        type,
-        Query.select()
-            .where(mapDbField(target) + " = ?", id)
-            .order(pageable.orderClause())
-            .offset(pageable.offset())
-            .limit(pageable.limit()),
-        result::add);
-    return Page.<T>builder().data(result).total(countBy(target, id)).build();
+  public Page<DTO> findBy(@NotNull String target, int id, Pageable pageable) {
+    List<DTO> result =
+        Arrays.stream(
+                ao.find(
+                    type,
+                    Query.select()
+                        .where(mapDbField(target) + " = ?", id)
+                        .order(pageable.orderClause())
+                        .offset(pageable.offset())
+                        .limit(pageable.limit())))
+            .map(this::entityToDto)
+            .collect(Collectors.toList());
+    return Page.<DTO>builder().data(result).total(countBy(target, id)).build();
   }
 
   @NotNull

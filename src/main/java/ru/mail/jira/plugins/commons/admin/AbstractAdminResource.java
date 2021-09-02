@@ -96,7 +96,7 @@ public abstract class AbstractAdminResource<DTO, T extends Entity> {
       }
     }
 
-    Page<T> result =
+    Page<DTO> result =
         repository.findAll(
             Pageable.builder()
                 .page(page)
@@ -105,9 +105,7 @@ public abstract class AbstractAdminResource<DTO, T extends Entity> {
                 .filter(Filter.just(filterDto))
                 .build());
 
-    return DataListDTO.just(
-        result.getData().stream().map(repository::entityToDto).collect(Collectors.toList()),
-        result.getTotal());
+    return DataListDTO.just(result.getData(), result.getTotal());
   }
 
   @GET()
@@ -134,7 +132,7 @@ public abstract class AbstractAdminResource<DTO, T extends Entity> {
       @Nullable @QueryParam("order") String order) {
     checkPermissions();
 
-    Page<T> result =
+    Page<DTO> result =
         repository.findBy(
             target,
             id,
@@ -144,9 +142,7 @@ public abstract class AbstractAdminResource<DTO, T extends Entity> {
                 .sort(Sort.build(repository.mapDbField(sort), order))
                 .build());
 
-    return DataListDTO.just(
-        result.getData().stream().map(repository::entityToDto).collect(Collectors.toList()),
-        result.getTotal());
+    return DataListDTO.just(result.getData(), result.getTotal());
   }
 
   @PUT
