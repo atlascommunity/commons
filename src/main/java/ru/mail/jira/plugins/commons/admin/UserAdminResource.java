@@ -9,6 +9,7 @@ import com.atlassian.jira.security.JiraAuthenticationContext;
 import com.atlassian.jira.security.groups.GroupManager;
 import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.jira.user.util.UserManager;
+import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -41,13 +42,13 @@ public class UserAdminResource {
 
   private final ObjectMapper objectMapper = new ObjectMapper();
 
-  protected UserAdminResource(
-      UserManager userManager,
-      GlobalPermissionManager globalPermissionManager,
-      JiraAuthenticationContext jiraAuthenticationContext,
-      GroupManager groupManager,
+  public UserAdminResource(
+      @ComponentImport UserManager userManager,
+      @ComponentImport GlobalPermissionManager globalPermissionManager,
+      @ComponentImport JiraAuthenticationContext jiraAuthenticationContext,
+      @ComponentImport GroupManager groupManager,
       PluginProperties pluginProperties,
-      UserSearchService userSearchService) {
+      @ComponentImport UserSearchService userSearchService) {
     this.userManager = userManager;
     this.globalPermissionManager = globalPermissionManager;
     this.groupManager = groupManager;

@@ -92,12 +92,14 @@ public class SentryClient {
   private static void setContextUser() {
     if (jiraAuthenticationContext != null && jiraAuthenticationContext.isLoggedInUser()) {
       ApplicationUser user = jiraAuthenticationContext.getLoggedInUser();
-      Sentry.setUser(
-          new UserBuilder()
-              .setId(user.getKey())
-              .setEmail(user.getEmailAddress())
-              .setUsername(user.getDisplayName())
-              .build());
+      Sentry.getStoredClient()
+          .getContext()
+          .setUser(
+              new UserBuilder()
+                  .setId(user.getKey())
+                  .setEmail(user.getEmailAddress())
+                  .setUsername(user.getDisplayName())
+                  .build());
     }
   }
 
