@@ -6,7 +6,7 @@
 
     <groupId>io.github.atlascommunity</groupId>
     <artifactId>commons</artifactId>
-    <version>3.8.8</version>
+    <version>3.8.9</version>
     <name>Commons plugin</name>
     <description>Commons library for atlascommunity Jira plugins</description>
     <url>https://github.com/atlascommunity/commons</url>
@@ -53,13 +53,7 @@
         <dependency>
             <groupId>io.sentry</groupId>
             <artifactId>sentry</artifactId>
-            <version>1.7.30</version>
-            <exclusions>
-                <exclusion>
-                    <artifactId>slf4j-api</artifactId>
-                    <groupId>org.slf4j</groupId>
-                </exclusion>
-            </exclusions>
+            <version>5.4.3</version>
         </dependency>
         <dependency>
             <groupId>com.konghq</groupId>
