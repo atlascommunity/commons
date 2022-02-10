@@ -2,10 +2,20 @@ package ru.mail.jira.plugins.commons;
 
 import com.atlassian.jira.security.JiraAuthenticationContext;
 import com.atlassian.jira.user.ApplicationUser;
+import com.sun.jersey.api.core.HttpRequestContext;
+import io.sentry.Breadcrumb;
 import io.sentry.Scope;
 import io.sentry.Sentry;
 import io.sentry.protocol.User;
+import java.net.URL;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.stream.Collectors;
 import javax.annotation.Nullable;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.UriInfo;
 import kong.unirest.Unirest;
@@ -13,6 +23,8 @@ import kong.unirest.UnirestInstance;
 import org.jetbrains.annotations.NotNull;
 
 public class SentryClient {
+  private static final List<String> SENSITIVE_HEADERS =
+      Arrays.asList("X-FORWARDED-FOR", "AUTHORIZATION", "COOKIE");
 
   private static JiraAuthenticationContext jiraAuthenticationContext;
   private static String pluginKey;
@@ -25,7 +37,9 @@ public class SentryClient {
     String dsn = pluginProperties.getSentryDsn().orElse(null);
     if (dsn != null && hasConnection(dsn)) {
       SentryClient.jiraAuthenticationContext = jiraAuthenticationContext;
-      Sentry.init(dsn);
+      pluginKey = pluginProperties.getPluginKey().orElse(null);
+      pluginVersion = pluginProperties.getPluginVersion().orElse(null);
+
       Sentry.init(
           options -> {
             options.setDsn(dsn);
@@ -33,12 +47,13 @@ public class SentryClient {
               options.setTag("plugin", pluginKey);
               options.setTag("version", pluginVersion);
               options.setRelease(pluginKey + ":" + pluginVersion);
-              options.setEnvironment(env);
+              try {
+                options.setEnvironment(new URL(env).getHost());
+              } catch (Exception e) {
+                // ignored
+              }
             }
           });
-
-      pluginKey = pluginProperties.getPluginKey().orElse(null);
-      pluginVersion = pluginProperties.getPluginVersion().orElse(null);
     }
   }
 
@@ -54,13 +69,23 @@ public class SentryClient {
             scope -> {
               setScopeUser(scope);
 
-              if (uriInfo != null) {
-                scope.setTag("path", uriInfo.getPath());
+              if (uriInfo != null && request != null) {
+                scope.addBreadcrumb(
+                    Breadcrumb.http(uriInfo.getAbsolutePath().toString(), request.getMethod()));
+              } else if (uriInfo != null) {
                 scope.setTag("url", uriInfo.getAbsolutePath().toString());
+              } else if (request != null) {
+                scope.setTag("method", request.getMethod());
               }
 
-              if (request != null) {
-                scope.setTag("method", request.getMethod());
+              if (request instanceof HttpRequestContext) {
+                HttpRequestContext httpRequest = (HttpRequestContext) request;
+                io.sentry.protocol.Request sentryRequest = new io.sentry.protocol.Request();
+                sentryRequest.setMethod(httpRequest.getMethod());
+                sentryRequest.setUrl(httpRequest.getRequestUri().toString());
+                sentryRequest.setQueryString(toString(httpRequest.getQueryParameters()));
+                sentryRequest.setHeaders(resolveHeadersMap(httpRequest));
+                scope.setRequest(sentryRequest);
               }
 
               Sentry.captureException(throwable);
@@ -112,5 +137,40 @@ public class SentryClient {
     } catch (Exception e) {
       return Boolean.FALSE;
     }
+  }
+
+  @Nullable
+  private static String toString(@Nullable List<String> values) {
+    return values != null ? String.join(",", values) : null;
+  }
+
+  @Nullable
+  private static String toString(@Nullable MultivaluedMap<String, String> values) {
+    try {
+      return values != null
+          ? values.entrySet().stream()
+              .map(e -> e.getKey() + "=" + e.getValue())
+              .collect(Collectors.joining("&"))
+          : null;
+    } catch (Exception e) {
+      return null;
+    }
+  }
+
+  @NotNull
+  private static Map<String, String> resolveHeadersMap(@NotNull HttpRequestContext request) {
+    Map<String, String> headersMap = new HashMap<>();
+
+    request
+        .getRequestHeaders()
+        .keySet()
+        .forEach(
+            headerName -> {
+              if (!SENSITIVE_HEADERS.contains(headerName.toUpperCase(Locale.ROOT))) {
+                headersMap.put(headerName, toString(request.getRequestHeader(headerName)));
+              }
+            });
+
+    return headersMap;
   }
 }
