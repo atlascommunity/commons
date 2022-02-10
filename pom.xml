@@ -6,7 +6,7 @@
 
   <groupId>io.github.atlascommunity</groupId>
   <artifactId>commons</artifactId>
-  <version>3.8.13</version>
+  <version>3.9.0</version>
   <name>Commons plugin</name>
   <description>Commons library for atlascommunity Jira plugins</description>
   <url>https://github.com/atlascommunity/commons</url>

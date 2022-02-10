@@ -14,14 +14,11 @@ public class GenericExceptionMapper implements ExceptionMapper<Exception> {
 
   private final Logger logger = LoggerFactory.getLogger(GenericExceptionMapper.class);
 
-  @Context Request request;
-  @Context UriInfo uriInfo;
-
   public GenericExceptionMapper() {}
 
   @Override
   public Response toResponse(Exception exception) {
-    SentryClient.capture(request, uriInfo, exception);
+    SentryClient.capture(exception);
 
     logger.error("REST Exception", exception);
 

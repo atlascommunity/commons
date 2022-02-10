@@ -2,22 +2,22 @@ package ru.mail.jira.plugins.commons;
 
 import com.atlassian.jira.security.JiraAuthenticationContext;
 import com.atlassian.jira.user.ApplicationUser;
-import com.sun.jersey.api.core.HttpRequestContext;
+import com.atlassian.jira.web.ExecutingHttpRequest;
 import io.sentry.Breadcrumb;
 import io.sentry.Scope;
 import io.sentry.Sentry;
+import io.sentry.protocol.Request;
 import io.sentry.protocol.User;
 import java.net.URL;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.stream.Collectors;
 import javax.annotation.Nullable;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Request;
-import javax.ws.rs.core.UriInfo;
+import javax.servlet.http.HttpServletRequest;
 import kong.unirest.Unirest;
 import kong.unirest.UnirestInstance;
 import org.jetbrains.annotations.NotNull;
@@ -58,33 +58,23 @@ public class SentryClient {
   }
 
   public static void capture(Throwable throwable) {
-    capture(null, null, throwable);
+    capture(ExecutingHttpRequest.get(), throwable);
   }
 
-  public static void capture(
-      @Nullable Request request, @Nullable UriInfo uriInfo, Throwable throwable) {
+  public static void capture(@Nullable HttpServletRequest request, Throwable throwable) {
     if (isInitialized()) {
       try {
         Sentry.withScope(
             scope -> {
               setScopeUser(scope);
 
-              if (uriInfo != null && request != null) {
-                scope.addBreadcrumb(
-                    Breadcrumb.http(uriInfo.getAbsolutePath().toString(), request.getMethod()));
-              } else if (uriInfo != null) {
-                scope.setTag("url", uriInfo.getAbsolutePath().toString());
-              } else if (request != null) {
-                scope.setTag("method", request.getMethod());
-              }
-
-              if (request instanceof HttpRequestContext) {
-                HttpRequestContext httpRequest = (HttpRequestContext) request;
-                io.sentry.protocol.Request sentryRequest = new io.sentry.protocol.Request();
-                sentryRequest.setMethod(httpRequest.getMethod());
-                sentryRequest.setUrl(httpRequest.getRequestUri().toString());
-                sentryRequest.setQueryString(toString(httpRequest.getQueryParameters()));
-                sentryRequest.setHeaders(resolveHeadersMap(httpRequest));
+              if (request != null) {
+                scope.addBreadcrumb(Breadcrumb.http(request.getRequestURI(), request.getMethod()));
+                Request sentryRequest = new Request();
+                sentryRequest.setMethod(request.getMethod());
+                sentryRequest.setUrl(request.getRequestURI());
+                sentryRequest.setQueryString(request.getQueryString());
+                sentryRequest.setHeaders(resolveHeadersMap(request));
                 scope.setRequest(sentryRequest);
               }
 
@@ -140,36 +130,22 @@ public class SentryClient {
   }
 
   @Nullable
-  private static String toString(@Nullable List<String> values) {
-    return values != null ? String.join(",", values) : null;
-  }
-
-  @Nullable
-  private static String toString(@Nullable MultivaluedMap<String, String> values) {
-    try {
-      return values != null
-          ? values.entrySet().stream()
-              .map(e -> e.getKey() + "=" + e.getValue())
-              .collect(Collectors.joining("&"))
-          : null;
-    } catch (Exception e) {
-      return null;
-    }
+  private static String toString(@Nullable Enumeration<String> values) {
+    return values != null ? String.join(",", Collections.list(values)) : null;
   }
 
   @NotNull
-  private static Map<String, String> resolveHeadersMap(@NotNull HttpRequestContext request) {
+  private static Map<String, String> resolveHeadersMap(@NotNull HttpServletRequest request) {
     Map<String, String> headersMap = new HashMap<>();
 
-    request
-        .getRequestHeaders()
-        .keySet()
-        .forEach(
-            headerName -> {
-              if (!SENSITIVE_HEADERS.contains(headerName.toUpperCase(Locale.ROOT))) {
-                headersMap.put(headerName, toString(request.getRequestHeader(headerName)));
-              }
-            });
+    Enumeration<String> iter = request.getHeaderNames();
+
+    while (iter.hasMoreElements()) {
+      String headerName = iter.nextElement();
+      if (!SENSITIVE_HEADERS.contains(headerName.toUpperCase(Locale.ROOT))) {
+        headersMap.put(headerName, toString(request.getHeaders(headerName)));
+      }
+    }
 
     return headersMap;
   }
